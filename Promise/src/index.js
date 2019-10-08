@@ -21,18 +21,17 @@ function MyPromise(executor) {
    * @param {number} value 
    */
   function resolve(value) {
-    if (this.status === 'pending') {
+    if (this.status === 'pending') { // 确保只执行一次
       this.onfulfilled = ___onfulfilled.call(this, value)
     }
   }
 
   /**
    * 为了缓存resolve方法的执行结果
-   * @param {*} value 
+   * @param {*} value value就是resolve方法的执行结果
    */
   function ___onfulfilled(value) {
     this.status = 'fulfilled'   // 更改内部状态
-    // value就是resolve方法的执行结果
     /**
      * @param {(value: number) => void} onfulfilled 这里是then方法中传入的参数
      */
@@ -46,7 +45,7 @@ function MyPromise(executor) {
    * @param {string} reason 
    */
   function reject(reason) {
-    if (this.status === 'pending') {
+    if (this.status === 'pending') {  // 确保只执行一次
       this.onrejected = ___onrejected.call(this, reason)
     }
   }
@@ -65,7 +64,7 @@ function MyPromise(executor) {
 
 
   /**
-   * @param {(value: number) => void} onfulfilled 处理成功的函数
+   * @param {(value: number) => any} onfulfilled 处理成功的函数
    * @param {(reason: any) => void} onrejected 处理出现异常的函数，如果传入该参数，那么catch方法就捕获不到了
    */
   this.then = function(onfulfilled, onrejected) {
@@ -75,10 +74,11 @@ function MyPromise(executor) {
         switch (self.status){
           case 'fulfilled': // resolved
             if (onfulfilled) {
+              // 将onfulfilled方法的返回值交给resolve，确保下一个.then方法能够得到上一个.then方法的返回值
               const nextValue = self.onfulfilled(onfulfilled) 
               resolve(nextValue)
             } else {
-              resolve()
+              resolve()   // 没有传入参数，假装传入了参数:)
             }
             break
           case 'rejected':  // rejected
