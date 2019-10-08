@@ -31,18 +31,18 @@ function MyPromise(executor) {
    * @param {*} value 
    */
   function ___onfulfilled(value) {
-    this.status = 'fulfilled'
+    this.status = 'fulfilled'   // 更改内部状态
     // value就是resolve方法的执行结果
     /**
-     * @param {(value: number) => void} outer 这里是then方法中传入的参数
+     * @param {(value: number) => void} onfulfilled 这里是then方法中传入的参数
      */
-    return (outer) => {
-      return outer(value) // 
+    return (onfulfilled) => {
+      return onfulfilled(value) // 
     }
   }
 
   /**
-   * 
+   * 触发异常的方法
    * @param {string} reason 
    */
   function reject(reason) {
@@ -53,20 +53,20 @@ function MyPromise(executor) {
 
   /**
    * 
-   * @param {Error} reason 
+   * @param {Error} reason 如果传入的不是一个Error对象，那么会使用Error包装一下
    */
   function ___onrejected(reason) {
-    this.status = 'rejected'
-    return (outer) => {
+    this.status = 'rejected'    // 更改内部状态
+    return (onrejected) => {
       reason = isError(reason) ? reason : new Error(reason)
-      return outer(reason)
+      return onrejected(reason)
     }
   }
 
 
   /**
-   * @param {(value: number) => void} onfulfilled
-   * @param {(reason: any) => void} onrejected
+   * @param {(value: number) => void} onfulfilled 处理成功的函数
+   * @param {(reason: any) => void} onrejected 处理出现异常的函数，如果传入该参数，那么catch方法就捕获不到了
    */
   this.then = function(onfulfilled, onrejected) {
     const self = this
@@ -75,14 +75,14 @@ function MyPromise(executor) {
         switch (self.status){
           case 'fulfilled': // resolved
             if (onfulfilled) {
-              const nextValue = self.onfulfilled(onfulfilled)
+              const nextValue = self.onfulfilled(onfulfilled) 
               resolve(nextValue)
             } else {
               resolve()
             }
             break
           case 'rejected':  // rejected
-            if (!onrejected) {
+            if (!onrejected) { // 如果没有传递onrejected参数，默认实现一个，确保catch方法能够捕获到
               onrejected = (reason) => reason
             }
             const nextReject = self.onrejected(onrejected)
@@ -90,7 +90,7 @@ function MyPromise(executor) {
             break
           case 'pending':   // 
           default:
-              setTimeout(waitStatus, 0) // 继续等待
+              setTimeout(waitStatus, 0) // 只要是pending状态，继续等待，直到不是pending
               break
         }
       }, 0);
