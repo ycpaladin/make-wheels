@@ -34,25 +34,26 @@ function MyPromise(executor) {
    */
   function resolve(value) {
     if (this.status === 'pending') { // 确保只执行一次
-      this.onfulfilled = ___onfulfilled.call(this, value)
+      this.onfulfilled = ___onfulfilled(value)
+      this.status = 'fulfilled'   // 更改内部状态
     }
   }
 
   /**
-   * 为了缓存resolve方法的执行结果
+   * 缓存resolve方法的执行结果
    * @param {*} value value就是resolve方法的执行结果
-   * @this {MyPromise}
    * @returns {(onfulfilled: (value: any) => void) => any}
    */
   function ___onfulfilled(value) {
-    this.status = 'fulfilled'   // 更改内部状态
     /**
      * @param {(value: number) => void} onfulfilled 这里是then方法中传入的参数
      */
-    return (onfulfilled) => {
+    return function(onfulfilled) {
       return onfulfilled(value) // 
     }
   }
+
+  // const ___onfulfilled = value => onfulfilled => onfulfilled(value)
 
   /**
    * 触发异常的方法
@@ -61,18 +62,17 @@ function MyPromise(executor) {
    */
   function reject(reason) {
     if (this.status === 'pending') {  // 确保只执行一次
-      this.onrejected = ___onrejected.call(this, reason)
+      this.onrejected = ___onrejected(reason)
+      this.status = 'rejected'    // 更改内部状态
     }
   }
 
   /**
    * 
    * @param {Error} reason 如果传入的不是一个Error对象，那么会使用Error包装一下
-   * @this {MyPromise}
    */
   function ___onrejected(reason) {
-    this.status = 'rejected'    // 更改内部状态
-    return (onrejected) => {
+    return function(onrejected) {
       reason = isError(reason) ? reason : new Error(reason)
       return onrejected(reason)
     }
