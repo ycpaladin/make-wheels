@@ -5,14 +5,14 @@ const { Subscription } = require('./Subscription');
 class Subject extends Observable {
   constructor() {
     super();
-    this.observers = [];
+    this.observers = []; // 将订阅者添加到此数组中
   }
 
   next(value) {
     if (this._complete) {
       throw new Error('this observable has completed!')
     }
-    // this.observer.next(value);
+    // 给每一个订阅者发送消息
     this.observers.forEach(observer => {
       observer.next(value);
     })
@@ -20,7 +20,7 @@ class Subject extends Observable {
 
   error(e) {
     this.observers.forEach(observer => {
-      observer.error(value);
+      observer.error(e);
     })
   }
 

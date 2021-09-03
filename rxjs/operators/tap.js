@@ -1,4 +1,6 @@
-const { Observable, Subscription } = require('../cyRxjs');
+const { Observable } = require('../Observable');
+const { Subscription } = require('../Subscription');
+
 
 module.exports.tap = (callback) => {
   /**

@@ -1,4 +1,4 @@
-const { Observable } = require('../cyRxjs');
+const { Observable } = require('../Observable');
 /**
  * 
  * @param {(value: any) => any} project 
