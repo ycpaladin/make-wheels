@@ -4,7 +4,7 @@
   "description": "## 这个是一个造轮子项目，目前包含以下轮子：",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,8 @@
   "homepage": "https://github.com/ycpaladin/make-wheels#readme",
   "dependencies": {
     "rxjs": "^7.3.0"
+  },
+  "devDependencies": {
+    "jest": "^27.2.0"
   }
 }
