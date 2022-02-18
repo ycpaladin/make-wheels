@@ -35,8 +35,9 @@ function createStore(reducer, initStateOrEnhancer, enhancer) {
     }
 
     function subscribe(listenter) {
-        const index = listenters.push(listenter);
+        listenters.push(listenter);
         return () => {
+            const index = listenters.findIndex(item => item === listenter);
             listenters.splice(index, 1);
         };
     }
