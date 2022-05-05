@@ -5,9 +5,10 @@ class Observable {
 
   /**
    * 
-   * @param {() => void} subscribe 
+   * @param {(next:(value) => void, error:(err) => void, complete:() => void) => () => void} subscribe 
    */
   constructor(subscribe) {
+    /**@type {(next:(value) => void, error:(err) => void, complete:() => void) => () => void} */
     this._subscribe = subscribe;
     this._error = false;
     this._complete = false;
@@ -16,15 +17,15 @@ class Observable {
      */
     this.source = null;
     /**
-     * @type {{call(this: { next(value): void }, source: Observable): void}}
+     * @type {{call(this: { next(value): void }, source: Observable): { next:(value)=>void;error:(err)=>void;complete:()=> void; }}}
      */
     this.operator = null;
   }
 
-  // 
+  //
   /**
    * 该方法与操作符有关, 通过此方法创建出来的 Observable 的subscribe方法执行不一样
-   * @param {{ call(subscribe, source: Observable): void }} operator 
+   * @param {{ call(subscribe, source: Observable): { next:(value)=>void;error:(err)=>void;complete:()=> void; } }} operator 
    * @returns 
    */
   lift(operator) {
@@ -67,16 +68,11 @@ class Observable {
 
   /**
    * 
-   * @param  {...any} args 
+   * @param  {...(input$: Observable) => Observable} args 
    * @returns {Observable}
    */
   pipe(...args) {
     return args.reduce(
-      /**
-       * 
-       * @param {Observable} prev 
-       * @param {(source: Observable) => Observable} fn 
-       */
       (prev, fn) => {
         return fn(prev)
       }, this)
